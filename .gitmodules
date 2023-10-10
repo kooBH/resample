@@ -4,3 +4,6 @@
 [submodule "lib/STFT"]
 	path = lib/STFT
 	url = https://github.com/koobh/STFT
+[submodule "minorninth"]
+	path = minorninth
+	url = https://github.com/minorninth/libresample.git
