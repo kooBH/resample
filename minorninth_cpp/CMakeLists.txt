@@ -7,6 +7,8 @@ set(COMPILE_OPTION)
 set(SRC)
 set(INCL)
 
+include(${CMAKE_CURRENT_LIST_DIR}/../lib/WAV/WAV.cmake)
+
 list(APPEND INCL
 	${CMAKE_CURRENT_LIST_DIR}
 	
@@ -48,7 +50,7 @@ list(APPEND LINKLIBS
 )
 endif()
 
-add_executable(test testresample.c ${SRC})
+add_executable(test test.cpp ${SRC})
 target_include_directories(test	PRIVATE	${INCL}  )
 target_link_libraries(test ${LINKLIBS})
 target_compile_options(test PRIVATE ${COMPILE_OPTION} )

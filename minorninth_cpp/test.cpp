@@ -13,6 +13,8 @@
 
 #include "libresample.h"
 
+#include "WAV.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -125,8 +127,59 @@ void runtest(int srclen, double freq, double factor,
    free(dst);
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv){
+
+  WAV in_48k(1,48000);
+  WAV mid_16k(1,16000);
+  WAV out_48k(1,48000);
+
+  in_48k.OpenFile("in_48k.wav");
+  mid_16k.NewFile("mid_16k.wav");
+  //out_48k.NewFile("out_48k.wav");
+
+  short* buf_io = new short[384];
+  short* buf_mid = new short[128];
+
+  float* buf_io_f = new float[384];
+  float* buf_mid_f = new float[128];
+
+   void *handle;
+   int i, out, o, srcused, errcount, rangecount;
+   int statlen, srcpos, lendiff;
+   int fwidth;
+
+   int srclen = 384;
+   double factor = 0.3333;
+   int expectedlen = (int)(srclen * factor);
+
+
+   handle = resample_open(1, factor, factor);
+   fwidth = resample_get_filter_width(handle);
+
+   while (!in_48k.IsEOF()) {
+    in_48k.ReadUnit(buf_io, 384);
+
+    for (int i = 0; i < 384; i++) {
+       buf_io_f[i] = static_cast<float>(buf_io[i])/32768.0;
+    }
+
+   o = resample_process(handle, factor,
+                           buf_io_f, 384,
+                           0, &srcused,
+                           buf_mid_f, 128);
+   for (int i = 0; i < 128; i++)
+      buf_mid[i] = static_cast<short>(buf_mid_f[i]*32768.0);
+   
+   mid_16k.Append(buf_mid, 128);
+  }
+   mid_16k.Finish();
+   in_48k.Finish();
+  resample_close(handle);
+  
+
+
+
+  /*
    int i, srclen, dstlen, ifreq;
    double factor;
 
@@ -177,6 +230,6 @@ int main(int argc, char **argv)
       dstlen = (int)(srclen * factor + 10);
       runtest(srclen, (double)ifreq, factor, srclen, dstlen);
    }
-
+*/
    return 0;
 }
