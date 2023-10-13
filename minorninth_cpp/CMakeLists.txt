@@ -22,6 +22,8 @@ list(APPEND SRC
 	${CMAKE_CURRENT_LIST_DIR}/resample.c
 	${CMAKE_CURRENT_LIST_DIR}/resample_defs.h
 	${CMAKE_CURRENT_LIST_DIR}/resamplesubs.c
+	
+	resampler.h
 )
 
 

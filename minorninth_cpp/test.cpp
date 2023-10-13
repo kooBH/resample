@@ -135,7 +135,7 @@ int main(int argc, char **argv){
 
   in_48k.OpenFile("in_48k.wav");
   mid_16k.NewFile("mid_16k.wav");
-  //out_48k.NewFile("out_48k.wav");
+  out_48k.NewFile("out_48k.wav");
 
   short* buf_io = new short[384];
   short* buf_mid = new short[128];
@@ -174,6 +174,39 @@ int main(int argc, char **argv){
   }
    mid_16k.Finish();
    in_48k.Finish();
+  resample_close(handle);
+
+  ///
+   srclen = 128;
+   factor = 3.0;
+   expectedlen = (int)(srclen * factor);
+
+
+   mid_16k.OpenFile("mid_16k.wav");
+   handle = resample_open(1, factor, factor);
+   fwidth = resample_get_filter_width(handle);
+
+   while (!mid_16k.IsEOF()) {
+    mid_16k.ReadUnit(buf_mid, srclen);
+
+    for (int i = 0; i < srclen; i++) {
+       buf_mid_f[i] = static_cast<float>(buf_mid[i])/32768.0;
+    }
+
+   o = resample_process(handle, factor,
+                           buf_mid_f, 128,
+                           0, &srcused,
+                           buf_io_f, 384);
+   for (int i = 0; i < 384; i++)
+      buf_io[i] = static_cast<short>(buf_io_f[i]*32768.0);
+   
+   out_48k.Append(buf_io, 384);
+  }
+   mid_16k.Finish();
+   out_48k.Finish();
+
+
+
   resample_close(handle);
   
 
